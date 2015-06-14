@@ -25,7 +25,6 @@ ListElement* createListElement(int inValue){
 	
 	newNode->value = inValue;
 	newNode->next = NULL;
-	
-//printf("created node with %d",(newNode->value));
+
 	return newNode;
 }

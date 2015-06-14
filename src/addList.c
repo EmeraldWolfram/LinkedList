@@ -43,22 +43,17 @@ void addList(LinkedList* currentList, int inValue){
 	ListElement* tempNode = currentList->head;
 	ListElement* currentNode = createListElement(inValue);
 	
-		printf("head ");
 		//check if the linked list empty. If empty, create a Node that the head point to
 		if(currentList->head == 0){
 			currentList->head = currentNode;
-			printf("*-> %d (First Node)\n", currentNode->value);
 		}
 		//if the list is not empty, find the last node and add a node as new last node
 		else{
 			while(tempNode->next != 0){
-				printf("-> %d", tempNode->value);
 				tempNode = tempNode->next;
 			}
 			tempNode->next = currentNode;
-			printf(" -> %d *-> %d\n", tempNode->value, currentNode->value);
 		}
 		//No matter what, the tail always point to last node
 		currentList->tail = currentNode;
-//		printf("\nValue of Node (Tail Pointing): %d\n\n", (currentList->tail)->value);
 }

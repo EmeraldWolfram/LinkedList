@@ -9,7 +9,6 @@ void setUp(void){}
 void tearDown(void){}
 	
 void test_Linking_of_Create_LinkedList_ListElement_and_AddList_Functions(void){
-	printf("\n\ntest_Linking_of_Create_LinkedList_ListElement_and_AddList_Functions\n");
 	LinkedList* myTestList = createLinkedList();
 	ListElement* first = createListElement(5);
 			
@@ -19,7 +18,6 @@ void test_Linking_of_Create_LinkedList_ListElement_and_AddList_Functions(void){
 } //This test make sure the error not causes by linking
 
 void test_LinkedList_With_Single_Node_Print_First_Node_With_HEAD_TAIL_Storing_1(void){
-	printf("\n\ntest_LinkedList_With_Single_Node_Print_First_Node_and_Tail_Pointing_Last_Node_Storing__1\n");
 	LinkedList* myTestList = createLinkedList();
 		addList(myTestList,1);
 		TEST_ASSERT_EQUAL(1,myTestList->tail->value);
@@ -29,7 +27,6 @@ void test_LinkedList_With_Single_Node_Print_First_Node_With_HEAD_TAIL_Storing_1(
 
 
 void test_LinkedList_With_Three_0_Node_Print_Nodes_Value_Print_Node_0_0_0(void){
-	printf("\n\ntest_LinkedList_With_Three_empty_Node_Print_Nodes_Value_Print_Node_0_0_0\n");
 	LinkedList* myTestList = createLinkedList();
 		
 		addList(myTestList,0);
@@ -44,7 +41,6 @@ void test_LinkedList_With_Three_0_Node_Print_Nodes_Value_Print_Node_0_0_0(void){
 
 
 void test_LinkedList_With_Four_Node_last_Node_Value_is_9(void){
-	printf("\n\ntest_LinkedList_With_Four_Node_last_Node_Value_is_9_by_Checking_from_Head_to_Last_Node\n");
 	LinkedList* myTestList = createLinkedList();
 	
 		addList(myTestList,3);
@@ -58,7 +54,6 @@ void test_LinkedList_With_Four_Node_last_Node_Value_is_9(void){
 }
 
 void test_LinkedList_With_Four_Node_and_Get_All_Node_Value(void){
-	printf("\n\ntest_LinkedList_With_Four_Node_and_Get_Second_Node_Value_equal_3\n");
 	LinkedList* myTestList = createLinkedList();
 
 		addList(myTestList,1);
