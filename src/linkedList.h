@@ -16,14 +16,36 @@
  *
  *	If the linked list is empty, both head and tail point to NULL
  *
+ * 
+ * ListElement
+ *
+ *	ListElement type object contain:
+ *		1. an integer
+ *		2. a pointer pointing to the next ListElement object
+ *	
+ *	ListElement type object is basically a node that can extend to
+ *	to store more value when needed.
+ *
+ *	It extend by pointing to another ListElement object.
+ *	If no more node behind, the pointer point to NULL
+ *
  */
-
+typedef struct ListElement ListElement;
+struct ListElement{
+	int value;
+	ListElement* next;
+};
 
 typedef struct{
 	ListElement* head;
 	ListElement* tail;
+  int length;
 }LinkedList;
 
+ListElement* createListElement(int value);
 LinkedList* createLinkedList();
+void addListLast(LinkedList* currentList, ListElement* currentNode);
+void addListFirst(LinkedList* stack, ListElement *elem);
+ListElement* listRemoveFirst(LinkedList* link);
 
 #endif // linkedList_H

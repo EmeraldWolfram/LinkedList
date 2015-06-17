@@ -2,6 +2,7 @@
 #include "linkedList.h"
 #include "listElement.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 /**
  * addList
@@ -39,21 +40,3 @@
  *
  */
 
-void addList(LinkedList* currentList, int inValue){
-	ListElement* tempNode = currentList->head;
-	ListElement* currentNode = createListElement(inValue);
-	
-		//check if the linked list empty. If empty, create a Node that the head point to
-		if(currentList->head == 0){
-			currentList->head = currentNode;
-		}
-		//if the list is not empty, find the last node and add a node as new last node
-		else{
-			while(tempNode->next != 0){
-				tempNode = tempNode->next;
-			}
-			tempNode->next = currentNode;
-		}
-		//No matter what, the tail always point to last node
-		currentList->tail = currentNode;
-}
