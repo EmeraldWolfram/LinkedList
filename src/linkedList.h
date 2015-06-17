@@ -44,8 +44,12 @@ typedef struct{
 
 ListElement* createListElement(int value);
 LinkedList* createLinkedList();
+
 void addListLast(LinkedList* currentList, ListElement* currentNode);
 void addListFirst(LinkedList* stack, ListElement *elem);
+
 ListElement* listRemoveFirst(LinkedList* link);
+ListElement* listRemoveLast(LinkedList* link);
+
 
 #endif // linkedList_H

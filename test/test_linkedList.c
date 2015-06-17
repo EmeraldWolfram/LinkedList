@@ -28,9 +28,9 @@ void test_Linking_of_Create_LinkedList(void){
 /**
  *  createListElement like this
  *
- *  *************
- *  * data = 10 *-------->NULL
- *  *************
+ *  **************
+ *  * value = 10 *-------->NULL
+ *  **************
  */
 void test_createListElement(void){
   ListElement* testElement = createListElement(10);
@@ -40,6 +40,15 @@ void test_createListElement(void){
   TEST_ASSERT_NULL(testElement->next);
 }
 
+/**
+ *  Before:                 After stackAdd:
+ *  ********                ********-------
+ *  * head *----->NULL      * head *       \
+ *  ********                ********       **************
+ *  * tail *----->NULL      * tail * ----->* value = 10 *--->NULL
+ *  ********                ********       **************
+ *
+ */
 void test_addListLast_add_Single_Node_at_Last(void){
 	LinkedList* myTestList = createLinkedList();
   ListElement* testElement = createListElement(1);
@@ -52,6 +61,14 @@ void test_addListLast_add_Single_Node_at_Last(void){
 	TEST_ASSERT_EQUAL(1,myTestList->head->value);
 	TEST_ASSERT_NULL(myTestList->tail->next);
 }
+
+/**
+ *  if Link List is NULL while calling addListLast
+ *
+ *  tell error
+ *  ERROR: Linked List cannot be NULL
+ *  Then, jump out directly!
+ */
 void test_addListLast_NULL_LinkedList_should_return_error(void){
   LinkedList* testLinkedList = NULL;
   ListElement* testElement = createListElement(1);
@@ -59,7 +76,21 @@ void test_addListLast_NULL_LinkedList_should_return_error(void){
  
   TEST_ASSERT_NULL(testLinkedList);
 }
-
+/**
+ *  Before:                 After 1st addListLast:
+ *  ********                ********-------
+ *  * head *----->NULL      * head *       \
+ *  ********                ********       **************
+ *  * tail *----->NULL      * tail * ----->* value = 1 *--->NULL
+ *  ********                ********       **************
+ *
+ *    After 2nd addListLast
+ *     ********--------------------------
+ *     * tail *                          \
+ *     ********       *************     ************
+ *     * head * ----->* value = 1 *--->* value = 2 *----->NULL
+ *     ********       *************     ************
+ */
 void test_addListLast_add_Two_Node_at_Last(void){
 	LinkedList* myTestList = createLinkedList();
   ListElement* testElement_1 = createListElement(1);
@@ -78,6 +109,17 @@ void test_addListLast_add_Two_Node_at_Last(void){
   TEST_ASSERT_EQUAL(2,myTestList->length);
 }
 
+/**
+ *  If the Element add-in is NULL, addListLast tell error and remain the Link List unchanged.
+ *
+ *  Before:                                        After:
+ *
+ *  ********---------                              ********-----------
+ *  * head *         \                             * head *           \
+ *  ********      *************                   ********      *************
+ *  * tail * ---> * value = 5 * -----> NULL       * tail * ---> * value = 5 * -----> NULL
+ *  ********      *************                   ********      *************
+ */
 void test_addListLast_add_NULL_Element_at_Last_should_return_error(void){
   LinkedList* testList = createLinkedList();
   ListElement* testElement_1 = createListElement(5);
@@ -93,7 +135,21 @@ void test_addListLast_add_NULL_Element_at_Last_should_return_error(void){
   TEST_ASSERT_EQUAL_PTR(testList->head, testList->tail);
   TEST_ASSERT_EQUAL(1,testList->length);
 }
-
+/**
+ *  Before:                 After 1st addListLast:
+ *  ********                ********-------
+ *  * head *----->NULL      * head *       \
+ *  ********                ********       *************
+ *  * tail *----->NULL      * tail * ----->* value = 1 *--->NULL
+ *  ********                ********       *************
+ *
+ *    After 3rd addListFirst
+ *     ********-------------------------------------------
+ *     * tail *                                           \
+ *     ********       ************     ************      *************
+ *     * head * ----->* value = 1 *---> * value = 2 *--->* value = 3 *----->NULL
+ *     ********       ************     ************      *************
+ */
 void test_addListLast_add_Three_Node_at_Last(void){
 	LinkedList* myTestList = createLinkedList();
   ListElement* testElement_1 = createListElement(1);
@@ -119,24 +175,23 @@ void test_addListLast_add_Three_Node_at_Last(void){
  *  Before:                 After stackAdd:
  *  ********                ********-------
  *  * head *----->NULL      * head *       \
- *  ********                ********       *************
- *  * tail *----->NULL      * tail * ----->* data = 10 *--->NULL
- *  ********                ********       *************
+ *  ********                ********       **************
+ *  * tail *----->NULL      * tail * ----->* value = 10 *--->NULL
+ *  ********                ********       **************
  *
  */
 void test_addListFirst_add_1_Element_in_front(void){
-  LinkedList* testStack = createLinkedList();
+  LinkedList* testList = createLinkedList();
   ListElement* testElement = createListElement(10);
-  addListFirst(testStack,testElement);
+  addListFirst(testList,testElement);
 
-  TEST_ASSERT_NOT_NULL(testStack);
+  TEST_ASSERT_NOT_NULL(testList);
   TEST_ASSERT_NOT_NULL(testElement);
-  TEST_ASSERT_EQUAL(10, testStack->head->value);
-  TEST_ASSERT_EQUAL(10, testStack->tail->value);
-  TEST_ASSERT_NULL(testStack->tail->next);
-  TEST_ASSERT_EQUAL(1,testStack->length);
+  TEST_ASSERT_EQUAL(10, testList->head->value);
+  TEST_ASSERT_EQUAL(10, testList->tail->value);
+  TEST_ASSERT_NULL(testList->tail->next);
+  TEST_ASSERT_EQUAL(1,testList->length);
 }
-
 
 /**
  *  if Link List is NULL while calling addListFirst
@@ -156,13 +211,13 @@ void test_addListFirst_NULL_LinkedList_add_1_Element_should_return_error(void){
 /**
  *  If the Element add-in is NULL, addListFirst tell error and remain the Link List unchanged.
  *
- *  Before:                                       After:
+ *  Before:                                        After:
  *
- *  ********---------                             ********-----------
- *  * head *         \                            * head *           \
- *  ********      *************                   ********      *************
- *  * tail * ---> * data = 10 * -----> NULL       * tail * ---> * data = 10 * -----> NULL
- *  ********      *************                   ********      *************
+ *  ********---------                              ********-----------
+ *  * head *         \                             * head *           \
+ *  ********      **************                   ********      **************
+ *  * tail * ---> * value = 10 * -----> NULL       * tail * ---> * value = 10 * -----> NULL
+ *  ********      **************                   ********      **************
  */
 void test_addListFirst_add_NULL_Element_in_front(void){
   LinkedList* testStack = createLinkedList();
@@ -185,16 +240,16 @@ void test_addListFirst_add_NULL_Element_in_front(void){
  *  Before:                 After 1st addListFirst:
  *  ********                ********-------
  *  * head *----->NULL      * head *       \
- *  ********                ********       *************
- *  * tail *----->NULL      * tail * ----->* data = 10 *--->NULL
- *  ********                ********       *************
+ *  ********                ********       **************
+ *  * tail *----->NULL      * tail * ----->* value = 10 *--->NULL
+ *  ********                ********       **************
  *
  *    After 2nd addListFirst
  *     ********--------------------------
  *     * tail *                          \
- *     ********       ************    *************
- *     * head * ----->* data = 5 *--->* data = 10 *----->NULL
- *     ********       ************    *************
+ *     ********       *************    **************
+ *     * head * ----->* value = 5 *--->* value = 10 *----->NULL
+ *     ********       *************    **************
  */
 void test_addListFirst_add_2_Element_in_front(void){
   LinkedList* testStack = createLinkedList();
@@ -217,16 +272,16 @@ void test_addListFirst_add_2_Element_in_front(void){
  *  Before:                 After 1st addListFirst:
  *  ********                ********-------
  *  * head *----->NULL      * head *       \
- *  ********                ********       *************
- *  * tail *----->NULL      * tail * ----->* data = 10 *--->NULL
- *  ********                ********       *************
+ *  ********                ********       **************
+ *  * tail *----->NULL      * tail * ----->* value = 10 *--->NULL
+ *  ********                ********       **************
  *
  *    After 3rd addListFirst
  *     ********-------------------------------------------
  *     * tail *                                           \
- *     ********       ************     ************    *************
- *     * head * ----->* data = 2 *---> * data = 5 *--->* data = 10 *----->NULL
- *     ********       ************     ************    *************
+ *     ********       *************     *************    **************
+ *     * head * ----->* value = 2 *---> * value = 5 *--->* value = 10 *----->NULL
+ *     ********       *************     *************    **************
  */
 void test_addListFirst_add_3_Element_in_front(void){
   LinkedList* testStack = createLinkedList();
@@ -253,17 +308,17 @@ void test_addListFirst_add_3_Element_in_front(void){
  *    Before
  *     ********-------------------------------------------
  *     * tail *                                           \
- *     ********       ************     ************    *************
- *     * head * ----->* data = 2 *---> * data = 5 *--->* data = 10 *----->NULL
- *     ********       ************     ************    *************
+ *     ********       *************     *************    **************
+ *     * head * ----->* value = 2 *---> * value = 5 *--->* value = 10 *----->NULL
+ *     ********       *************     *************    **************
  *
  *
  *    After stackRemove
  *     ********--------------------------
  *     * tail *                          \
- *     ********       ************    *************
- *     * head * ----->* data = 5 *--->* data = 10 *----->NULL
- *     ********       ************    *************
+ *     ********       *************    **************
+ *     * head * ----->* value = 5 *--->* value = 10 *----->NULL
+ *     ********       *************    **************
  *
  */
 void test_listRemoveFirst_given_LinkedList_with_3_Element_should_return_LinkedList_with_2_element(void){
@@ -295,9 +350,9 @@ void test_listRemoveFirst_given_LinkedList_with_3_Element_should_return_LinkedLi
  *  Before:    
  *  ********-------
  *  * head *       \
- *  ********       *************
- *  * tail * ----->* data = 10 *--->NULL
- *  ********       *************
+ *  ********       **************
+ *  * tail * ----->* value = 10 *--->NULL
+ *  ********       **************
  *
  *   After
  *     ******** ----->NULL
@@ -322,7 +377,7 @@ void test_listRemoveFirst_given_LinkList_with_1_Element_should_return_empty_Link
   TEST_ASSERT_EQUAL(10,removedElement->value);
   TEST_ASSERT_EQUAL(0,testStack->length);
 }
-//*********************************CONTINUE HERE
+
 /**
  *  if LinkedList is NULL while calling listRemoveFirst
  *
@@ -330,10 +385,148 @@ void test_listRemoveFirst_given_LinkList_with_1_Element_should_return_empty_Link
  *  ERROR: Link List cannot be NULL
  *  Then, return NULL!
  */
-void test_stackRemove_NULL_Stack_remove_Element_should_return_error(void){
-  LinkedList* testStack = NULL;
+void test_listRemoveFirst_NULL_List_remove_Element_should_return_error(void){
+  LinkedList* testList = NULL;
   ListElement* removedElement = malloc(sizeof(ListElement));
-  removedElement = listRemoveFirst(testStack);
+  removedElement = listRemoveFirst(testList);
 
-  TEST_ASSERT_NULL(testStack);
+  TEST_ASSERT_NULL(testList);
+}
+
+/**
+ *  If the Stack is empty, stackRemove tell error and return a NULL
+ *
+ *  Before:                     After:
+ *
+ *  ********                    ********
+ *  * head *-------->NULL       * head *-------->NULL
+ *  ********                    ********
+ *  * tail *-------->NULL       * tail *-------->NULL
+ *  ********                    ********
+ *
+ *                              Return NULL
+ */
+void test_listRemoveFirst_given_EmptyLinkedList_should_display_error_and_return_NULL_Element(void){
+  LinkedList* testList = createLinkedList();
+  ListElement* removedElement = malloc(sizeof(ListElement));
+
+  removedElement = listRemoveFirst(testList);
+
+  TEST_ASSERT_NOT_NULL(testList);
+  TEST_ASSERT_NULL(removedElement);
+  TEST_ASSERT_EQUAL(0,testList->length);
+}
+/**
+ *    Before
+ *     ********-------------------------------------------
+ *     * tail *                                           \
+ *     ********       **************     *************    *************
+ *     * head * ----->* value = 10 *---> * value = 5 *--->* value = 2 *----->NULL
+ *     ********       **************     *************    *************
+ *
+ *
+ *    After stackRemove
+ *     ********--------------------------
+ *     * tail *                          \
+ *     ********       **************    **************
+ *     * head * ----->* value = 10 *--->* value = 5 *----->NULL
+ *     ********       **************    **************
+ */
+ 
+ 
+void test_listRemoveLast_given_LinkedList_with_3_Element_should_return_removed_element(void){
+  LinkedList* testList = createLinkedList();
+  ListElement* removedElement = malloc(sizeof(ListElement));
+  ListElement* testElement_1 = createListElement(10);
+  ListElement* testElement_2 = createListElement(5);
+  ListElement* testElement_3 = createListElement(2);
+  addListLast(testList,testElement_1);
+  addListLast(testList,testElement_2);
+  addListLast(testList,testElement_3);
+
+  removedElement = listRemoveLast(testList);
+
+  TEST_ASSERT_NOT_NULL(testList);
+  TEST_ASSERT_NOT_NULL(testElement_1);
+  TEST_ASSERT_NOT_NULL(testElement_2);
+  TEST_ASSERT_NOT_NULL(testElement_3);
+  TEST_ASSERT_NOT_NULL(removedElement);
+  TEST_ASSERT_EQUAL(2, removedElement->value);
+  TEST_ASSERT_NULL(removedElement->next);
+  TEST_ASSERT_EQUAL(10, testList->head->value);
+  TEST_ASSERT_EQUAL(5, testList->tail->value);
+  TEST_ASSERT_NULL(testList->tail->next);
+  TEST_ASSERT_EQUAL(2,testList->length);
+}
+
+/**
+ *  Before:    
+ *  ********-------
+ *  * head *       \
+ *  ********       **************
+ *  * tail * ----->* value = 10 *--->NULL
+ *  ********       **************
+ *
+ *   After
+ *     ******** ----->NULL
+ *     * tail *
+ *     ******** 
+ *     * head * ----->NULL
+ *     ********
+ */
+void test_listRemoveLast_given_LinkedList_with_1_Element_should_return_removed_element(void){
+  LinkedList* testList = createLinkedList();
+  ListElement* removedElement = malloc(sizeof(ListElement));
+  ListElement* testElement_1 = createListElement(10);
+  addListLast(testList,testElement_1);
+
+  removedElement = listRemoveLast(testList);
+
+  TEST_ASSERT_NOT_NULL(testList);
+  TEST_ASSERT_NOT_NULL(testElement_1);
+  TEST_ASSERT_NOT_NULL(removedElement);
+  TEST_ASSERT_EQUAL(10, removedElement->value);
+  TEST_ASSERT_NULL(removedElement->next);
+  TEST_ASSERT_NULL(testList->head);
+  TEST_ASSERT_NULL(testList->tail);
+  TEST_ASSERT_EQUAL(0,testList->length);
+}
+
+/**
+ *  If the Linked List is empty, listRemoveLast tell error and return a NULL
+ *
+ *  Before:                     After:
+ *
+ *  ********                    ********
+ *  * head *-------->NULL       * head *-------->NULL
+ *  ********                    ********
+ *  * tail *-------->NULL       * tail *-------->NULL
+ *  ********                    ********
+ *
+ *                              Return NULL
+ */
+void test_listRemoveLast_given_EmptyLinkedList_should_display_error_and_return_NULL_Element(void){
+  LinkedList* testList = createLinkedList();
+  ListElement* removedElement = malloc(sizeof(ListElement));
+
+  removedElement = listRemoveLast(testList);
+
+  TEST_ASSERT_NOT_NULL(testList);
+  TEST_ASSERT_NULL(removedElement);
+  TEST_ASSERT_EQUAL(0,testList->length);
+}
+
+/**
+ *  if LinkedList is NULL while calling listRemoveLast
+ *
+ *  tell error
+ *  ERROR: Link List cannot be NULL
+ *  Then, return NULL!
+ */
+void test_listRemoveLast_NULL_List_remove_Element_should_return_error(void){
+  LinkedList* testList = NULL;
+  ListElement* removedElement = malloc(sizeof(ListElement));
+  removedElement = listRemoveLast(testList);
+
+  TEST_ASSERT_NULL(testList);
 }

@@ -126,3 +126,45 @@ ListElement* listRemoveFirst(LinkedList* link){
   }
   return removedElement;
 }
+
+ListElement* listRemoveLast(LinkedList* link){
+  ListElement* removedElement;
+  ListElement* tempNode = malloc(sizeof(ListElement));
+ 
+  if(link == NULL){    
+    removedElement = NULL;
+    printf("ERROR: Link List cannot be NULL!");
+  }
+  else if(link->head == NULL){
+    removedElement = NULL;
+    printf("Nothing to remove, empty stack here! Return empty element");
+  }
+  else{
+    tempNode = link->head;
+    removedElement = malloc(sizeof(ListElement));
+    removedElement = link->tail;
+    if(tempNode->next != NULL){
+      while(tempNode->next != link->tail){
+        tempNode = tempNode->next;
+      }
+      link->tail = tempNode;
+      tempNode->next = NULL;
+    }
+    else{
+      link->head = NULL;
+      link->tail = NULL;
+    }
+    link->length --;
+  }
+  return removedElement;
+}
+
+
+
+
+
+
+
+
+
+
