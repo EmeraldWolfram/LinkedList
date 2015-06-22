@@ -1,6 +1,5 @@
 #ifndef linkedList_H
 #define linkedList_H
-#include "listElement.h"
 
 /**
  * LinkedList
