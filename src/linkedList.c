@@ -40,7 +40,7 @@ LinkedList* createLinkedList(){
 	return newList;
 }
 
-ListElement* createListElement(int inValue){
+ListElement* createListElement(void* inValue){
 	ListElement* newNode = malloc(sizeof(ListElement));
 	assert(newNode != NULL);
   
@@ -159,12 +159,34 @@ ListElement* listRemoveLast(LinkedList* link){
   return removedElement;
 }
 
+ListElement* listFind(LinkedList* list, void* value, int(*compare)(void*,void*)){
+  ListElement* tempElement;
 
+  if(list == NULL){
+    return NULL;
+  }
+  else if(list->head == NULL){
+    return NULL;
+  }
+  else{
+    tempElement = list->head;
+    while(compare(tempElement->value,value) != 0){
+      tempElement = tempElement->next;
+    }
+  }
+  return tempElement;
+}
 
+int intCompare(void *first, void *second){
+  if(*((int*)first) == *((int*)second)){
+    return 0;
+  }
+  return 1;
+}
 
-
-
-
-
-
-
+int stringCompare(void *first, void *second){
+  if(strcmp((char*)first,(char*)second) == 0){
+    return 0;
+  }
+  return 1;
+}

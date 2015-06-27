@@ -29,9 +29,9 @@
  *	If no more node behind, the pointer point to NULL
  *
  */
-typedef struct ListElement ListElement;
-struct ListElement{
-	int value;
+typedef struct ListElement_t ListElement;
+struct ListElement_t{
+	void* value;
 	ListElement* next;
 };
 
@@ -41,7 +41,7 @@ typedef struct{
   int length;
 }LinkedList;
 
-ListElement* createListElement(int value);
+ListElement* createListElement(void* value);
 LinkedList* createLinkedList();
 
 void addListLast(LinkedList* currentList, ListElement* currentNode);
@@ -50,5 +50,8 @@ void addListFirst(LinkedList* stack, ListElement *elem);
 ListElement* listRemoveFirst(LinkedList* link);
 ListElement* listRemoveLast(LinkedList* link);
 
+ListElement* listFind(LinkedList* list, void* value, int(*compare)(void*,void*));
+int intCompare(void *first, void *second);
+int stringCompare(void *first, void *second);
 
 #endif // linkedList_H
