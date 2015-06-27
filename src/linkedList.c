@@ -170,8 +170,11 @@ ListElement* listFind(LinkedList* list, void* value, int(*compare)(void*,void*))
   }
   else{
     tempElement = list->head;
-    while(compare(tempElement->value,value) != 0){
+    while(compare(tempElement->value,value) != 0 && tempElement->next != NULL){
       tempElement = tempElement->next;
+    }
+    if(tempElement->next == NULL){
+      return NULL;
     }
   }
   return tempElement;
