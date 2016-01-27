@@ -1,8 +1,12 @@
 #include "unity.h"
-#include "linkedList.h"
+#include "LinkedList.h"
+#include "customAssertion.h"
+#include "ErrorObject.h"
+#include "CException.h"
 #include <stdlib.h>
 #include <stdio.h>
 
+ErrorObject* err;
 void setUp(void){}
 
 void tearDown(void){}
@@ -16,7 +20,7 @@ void tearDown(void){}
  *  * tail *-------->NULL
  *  ********
  */
-void test_Linking_of_Create_LinkedList(void){
+void test_createLinkedList(void){
 	LinkedList* myTestList = createLinkedList();
   
   TEST_ASSERT_NOT_NULL(myTestList);
@@ -34,7 +38,7 @@ void test_Linking_of_Create_LinkedList(void){
  */
 void test_createListElement(void){
   int i = 10;
-  ListElement* testElement = createListElement((void*)&i);
+  ListElement* testElement = createListElement(&i);
 
   TEST_ASSERT_NOT_NULL(testElement);
   TEST_ASSERT_EQUAL(10, *(int*)(testElement->value));
@@ -53,31 +57,38 @@ void test_createListElement(void){
 void test_addListLast_add_Single_Node_at_Last(void){
 	LinkedList* myTestList = createLinkedList();
   int i = 1;
-  ListElement* testElement = createListElement((void *)&i);
+  ListElement* testElement = createListElement(&i);
   
 	addListLast(myTestList,testElement);
   
   TEST_ASSERT_NOT_NULL(myTestList);
   TEST_ASSERT_NOT_NULL(testElement);
-	TEST_ASSERT_EQUAL(1,*(int*)myTestList->tail->value);
+	TEST_ASSERT_LIST_ELEMENT(testElement, myTestList->tail);
+	TEST_ASSERT_LIST_ELEMENT(testElement, myTestList->head);
 	TEST_ASSERT_EQUAL(1,*(int*)myTestList->head->value);
+	TEST_ASSERT_EQUAL(1, myTestList->length);
 	TEST_ASSERT_NULL(myTestList->tail->next);
 }
 
 /**
  *  if Link List is NULL while calling addListLast
  *
- *  tell error
+ *  Throw ERR_NULL_LIST
  *  ERROR: Linked List cannot be NULL
  *  Then, jump out directly!
  */
 void test_addListLast_NULL_LinkedList_should_return_error(void){
-  LinkedList* testLinkedList = NULL;
-  int i = 1;
-  ListElement* testElement = createListElement((void*)&i);
-  addListLast(testLinkedList, testElement);
- 
-  TEST_ASSERT_NULL(testLinkedList);
+  Try{
+    LinkedList* testLinkedList = NULL;
+    int i = 1;
+    ListElement* testElement = createListElement(&i);
+    addListLast(testLinkedList, testElement);
+    TEST_FAIL_MESSAGE("Expected ERR_NULL_LIST but no error thrown");
+  }Catch(err){
+    TEST_ASSERT_EQUAL(ERR_NULL_LIST, err->errorCode);
+    TEST_ASSERT_EQUAL_STRING("ERROR: Link List cannot be NULL!", err->errorMsg);
+    free(err);
+  }
 }
 
 /**
@@ -99,20 +110,17 @@ void test_addListLast_add_Two_Node_at_Last(void){
 	LinkedList* myTestList = createLinkedList();
   int i_1 = 1;
   int i_2 = 2;
-  ListElement* testElement_1 = createListElement((void*)&i_1);
-  ListElement* testElement_2 = createListElement((void*)&i_2);
+  ListElement* testElement_1 = createListElement(&i_1);
+  ListElement* testElement_2 = createListElement(&i_2);
   
 	addListLast(myTestList,testElement_1);
 	addListLast(myTestList,testElement_2);
   
-  TEST_ASSERT_NOT_NULL(myTestList);
-  TEST_ASSERT_NOT_NULL(testElement_1);
-  TEST_ASSERT_NOT_NULL(testElement_2);
-	TEST_ASSERT_EQUAL(2,*(int*)myTestList->tail->value);
-	TEST_ASSERT_EQUAL(1,*(int*)myTestList->head->value);
-  TEST_ASSERT_EQUAL_PTR(myTestList->head->next,myTestList->tail);
-	TEST_ASSERT_NULL(myTestList->tail->next);
+	TEST_ASSERT_LIST_ELEMENT(testElement_1, myTestList->head);
+	TEST_ASSERT_LIST_ELEMENT(testElement_2, myTestList->tail);
+  TEST_ASSERT_LIST_ELEMENT(myTestList->head->next, myTestList->tail);
   TEST_ASSERT_EQUAL(2,myTestList->length);
+	TEST_ASSERT_NULL(myTestList->tail->next);
 }
 
 /**
@@ -126,22 +134,19 @@ void test_addListLast_add_Two_Node_at_Last(void){
  *  * tail * ---> * value = 5 * -----> NULL       * tail * ---> * value = 5 * -----> NULL
  *  ********      *************                   ********      *************
  */
-void test_addListLast_add_NULL_Element_at_Last_should_return_error(void){
+void test_addListLast_add_NULL_Element_at_Last_should_do_nothing(void){
   LinkedList* testList = createLinkedList();
   int i = 5;
-  ListElement* testElement_1 = createListElement((void*)&i);
+  ListElement* testElement_1 = createListElement(&i);
   ListElement* testElement_2 = NULL;
   addListLast(testList,testElement_1);
   addListLast(testList,testElement_2);
 
-  TEST_ASSERT_NOT_NULL(testList);
-  TEST_ASSERT_NULL(testElement_2);
-  TEST_ASSERT_NOT_NULL(testElement_1);
-  TEST_ASSERT_EQUAL(5, *(int*)testList->head->value);
+  TEST_ASSERT_LIST_ELEMENT(testList->head, testList->tail);
   TEST_ASSERT_NULL(testList->head->next);
-  TEST_ASSERT_EQUAL_PTR(testList->head, testList->tail);
   TEST_ASSERT_EQUAL(1,testList->length);
 }
+
 /**
  *  Before:                 After 1st addListLast:
  *  ********                ********-------
@@ -162,21 +167,18 @@ void test_addListLast_add_Three_Node_at_Last(void){
   int i_1 = 1;
   int i_2 = 2;
   int i_3 = 3;
-  ListElement* testElement_1 = createListElement((void*)&i_1);
-  ListElement* testElement_2 = createListElement((void*)&i_2);
-  ListElement* testElement_3 = createListElement((void*)&i_3);
+  ListElement* testElement_1 = createListElement(&i_1);
+  ListElement* testElement_2 = createListElement(&i_2);
+  ListElement* testElement_3 = createListElement(&i_3);
 		
 	addListLast(myTestList,testElement_1);
 	addListLast(myTestList,testElement_2);
 	addListLast(myTestList,testElement_3);
-		
-  TEST_ASSERT_NOT_NULL(myTestList);
-  TEST_ASSERT_NOT_NULL(testElement_1); 
-  TEST_ASSERT_NOT_NULL(testElement_2); 
-  TEST_ASSERT_NOT_NULL(testElement_3); 
-  TEST_ASSERT_EQUAL(1, *(int*)myTestList->head->value);
-  TEST_ASSERT_EQUAL(3, *(int*)myTestList->tail->value);
-	TEST_ASSERT_EQUAL_PTR(myTestList->head->next->next,myTestList->tail);
+	 
+  TEST_ASSERT_LIST_ELEMENT(testElement_1, myTestList->head);
+  TEST_ASSERT_LIST_ELEMENT(testElement_2, myTestList->head->next);
+  TEST_ASSERT_LIST_ELEMENT(testElement_3, myTestList->tail);
+	TEST_ASSERT_LIST_ELEMENT(myTestList->head->next->next,myTestList->tail);
 	TEST_ASSERT_NULL(myTestList->tail->next);
   TEST_ASSERT_EQUAL(3,myTestList->length);
 }
@@ -196,10 +198,8 @@ void test_addListFirst_add_1_Element_in_front(void){
   ListElement* testElement = createListElement((void*)&i);
   addListFirst(testList,testElement);
 
-  TEST_ASSERT_NOT_NULL(testList);
-  TEST_ASSERT_NOT_NULL(testElement);
-  TEST_ASSERT_EQUAL(10, *(int*)testList->head->value);
-  TEST_ASSERT_EQUAL(10, *(int*)testList->tail->value);
+  TEST_ASSERT_LIST_ELEMENT(testElement, testList->tail);
+  TEST_ASSERT_LIST_ELEMENT(testElement, testList->head);
   TEST_ASSERT_NULL(testList->tail->next);
   TEST_ASSERT_EQUAL(1,testList->length);
 }
@@ -212,12 +212,17 @@ void test_addListFirst_add_1_Element_in_front(void){
  *  Then, jump out directly!
  */
 void test_addListFirst_NULL_LinkedList_add_1_Element_should_return_error(void){
-  LinkedList* testStack = NULL;
-  int i = 10;
-  ListElement* testElement = createListElement((void*)&i);
-  addListFirst(testStack,testElement);
-
-  TEST_ASSERT_NULL(testStack);
+  Try{
+    LinkedList* testList = NULL;
+    int i = 10;
+    ListElement* testElement = createListElement(&i);
+    addListFirst(testList,testElement);
+    TEST_FAIL_MESSAGE("Expected ERR_NULL_LIST but no error thrown");
+  }Catch(err){
+    TEST_ASSERT_EQUAL(ERR_NULL_LIST, err->errorCode);
+    TEST_ASSERT_EQUAL_STRING("ERROR: Link List cannot be NULL!", err->errorMsg);
+    free(err);
+  }
 }
 
 /**
@@ -232,20 +237,17 @@ void test_addListFirst_NULL_LinkedList_add_1_Element_should_return_error(void){
  *  ********      **************                   ********      **************
  */
 void test_addListFirst_add_NULL_Element_in_front(void){
-  LinkedList* testStack = createLinkedList();
+  LinkedList* testList = createLinkedList();
   int i = 10;
-  ListElement* testElement_1 = createListElement((void*)&i);
+  ListElement* testElement_1 = createListElement(&i);
   ListElement* testElement_2 = NULL;
-  addListFirst(testStack,testElement_1);
-  addListFirst(testStack,testElement_2);
+  addListFirst(testList,testElement_1);
+  addListFirst(testList,testElement_2);
 
-  TEST_ASSERT_NOT_NULL(testStack);
-  TEST_ASSERT_NULL(testElement_2);
-  TEST_ASSERT_NOT_NULL(testElement_1);
-  TEST_ASSERT_EQUAL(10, *(int*)testStack->head->value);
-  TEST_ASSERT_NULL(testStack->head->next);
-  TEST_ASSERT_EQUAL_PTR(testStack->head, testStack->tail);
-  TEST_ASSERT_EQUAL(1,testStack->length);
+  TEST_ASSERT_LIST_ELEMENT(testElement_1, testList->head);
+  TEST_ASSERT_LIST_ELEMENT(testElement_1, testList->tail);
+  TEST_ASSERT_NULL(testList->head->next);
+  TEST_ASSERT_EQUAL(1,testList->length);
 }
 
 
@@ -265,22 +267,19 @@ void test_addListFirst_add_NULL_Element_in_front(void){
  *     ********       *************    **************
  */
 void test_addListFirst_add_2_Element_in_front(void){
-  LinkedList* testStack = createLinkedList();
+  LinkedList* testList = createLinkedList();
   int i_10 = 10;
   int i_5 = 5;
-  ListElement* testElement_1 = createListElement((void*)&i_10);
-  ListElement* testElement_2 = createListElement((void*)&i_5);
-  addListFirst(testStack,testElement_1);
-  addListFirst(testStack,testElement_2);
+  ListElement* testElement_1 = createListElement(&i_10);
+  ListElement* testElement_2 = createListElement(&i_5);
+  addListFirst(testList,testElement_1);
+  addListFirst(testList,testElement_2);
 
-  TEST_ASSERT_NOT_NULL(testStack);
-  TEST_ASSERT_NOT_NULL(testElement_1);
-  TEST_ASSERT_NOT_NULL(testElement_2);
-  TEST_ASSERT_EQUAL(5, *(int*)testStack->head->value);
-  TEST_ASSERT_EQUAL(10, *(int*)testStack->head->next->value);
-  TEST_ASSERT_EQUAL_PTR(testStack->head->next, testStack->tail);
-  TEST_ASSERT_NULL(testStack->tail->next);
-  TEST_ASSERT_EQUAL(2,testStack->length);
+  TEST_ASSERT_LIST_ELEMENT(testElement_2, testList->head);
+  TEST_ASSERT_LIST_ELEMENT(testElement_1, testList->tail);
+  TEST_ASSERT_LIST_ELEMENT(testList->head->next, testList->tail);
+  TEST_ASSERT_NULL(testList->tail->next);
+  TEST_ASSERT_EQUAL(2,testList->length);
 }
 
 /**
@@ -299,27 +298,23 @@ void test_addListFirst_add_2_Element_in_front(void){
  *     ********       *************     *************    **************
  */
 void test_addListFirst_add_3_Element_in_front(void){
-  LinkedList* testStack = createLinkedList();
+  LinkedList* testList = createLinkedList();
   int i_10 = 10;
   int i_5 = 5;
   int i_2 = 2;
-  ListElement* testElement_1 = createListElement((void*)&i_10);
-  ListElement* testElement_2 = createListElement((void*)&i_5);
-  ListElement* testElement_3 = createListElement((void*)&i_2);
-  addListFirst(testStack,testElement_1);
-  addListFirst(testStack,testElement_2);
-  addListFirst(testStack,testElement_3);
+  ListElement* testElement_1 = createListElement(&i_10);
+  ListElement* testElement_2 = createListElement(&i_5);
+  ListElement* testElement_3 = createListElement(&i_2);
+  addListFirst(testList,testElement_1);
+  addListFirst(testList,testElement_2);
+  addListFirst(testList,testElement_3);
 
-  TEST_ASSERT_NOT_NULL(testStack);
-  TEST_ASSERT_NOT_NULL(testElement_1);
-  TEST_ASSERT_NOT_NULL(testElement_2);
-  TEST_ASSERT_NOT_NULL(testElement_3);
-  TEST_ASSERT_EQUAL(2, *(int*)testStack->head->value);
-  TEST_ASSERT_EQUAL(5, *(int*)testStack->head->next->value);
-  TEST_ASSERT_EQUAL(10, *(int*)testStack->tail->value);
-  TEST_ASSERT_EQUAL_PTR(testStack->head->next->next, testStack->tail);
-  TEST_ASSERT_NULL(testStack->tail->next);
-  TEST_ASSERT_EQUAL(3,testStack->length);
+  TEST_ASSERT_LIST_ELEMENT(testElement_3, testList->head);
+  TEST_ASSERT_LIST_ELEMENT(testElement_2, testList->head->next);
+  TEST_ASSERT_LIST_ELEMENT(testElement_1, testList->tail);
+  TEST_ASSERT_LIST_ELEMENT(testList->head->next->next, testList->tail);
+  TEST_ASSERT_NULL(testList->tail->next);
+  TEST_ASSERT_EQUAL(3,testList->length);
 }
 
 /**
@@ -340,31 +335,27 @@ void test_addListFirst_add_3_Element_in_front(void){
  *
  */
 void test_listRemoveFirst_given_LinkedList_with_3_Element_should_return_LinkedList_with_2_element(void){
-  LinkedList* testStack = createLinkedList();
-  ListElement* removedElement = malloc(sizeof(ListElement));
+  LinkedList* testList = createLinkedList();
+  ListElement* removedElement;
   int i_10 = 10;
   int i_5 = 5;
   int i_2 = 2;
-  ListElement* testElement_1 = createListElement((void*)&i_10);
-  ListElement* testElement_2 = createListElement((void*)&i_5);
-  ListElement* testElement_3 = createListElement((void*)&i_2);
-  addListFirst(testStack,testElement_1);
-  addListFirst(testStack,testElement_2);
-  addListFirst(testStack,testElement_3);
+  ListElement* testElement_1 = createListElement(&i_10);
+  ListElement* testElement_2 = createListElement(&i_5);
+  ListElement* testElement_3 = createListElement(&i_2);
+  addListFirst(testList,testElement_1);
+  addListFirst(testList,testElement_2);
+  addListFirst(testList,testElement_3);
 
-  removedElement = listRemoveFirst(testStack);
+  removedElement = listRemoveFirst(testList);
 
-  TEST_ASSERT_NOT_NULL(testStack);
-  TEST_ASSERT_NOT_NULL(testElement_1);
-  TEST_ASSERT_NOT_NULL(testElement_2);
-  TEST_ASSERT_NOT_NULL(testElement_3);
   TEST_ASSERT_NOT_NULL(removedElement);
-  TEST_ASSERT_EQUAL(2, *(int*)removedElement->value);
+  TEST_ASSERT_LIST_ELEMENT(testElement_3, removedElement);
   TEST_ASSERT_NULL(removedElement->next);
-  TEST_ASSERT_EQUAL(5, *(int*)testStack->head->value);
-  TEST_ASSERT_EQUAL(10, *(int*)testStack->tail->value);
-  TEST_ASSERT_NULL(testStack->tail->next);
-  TEST_ASSERT_EQUAL(2,testStack->length);
+  TEST_ASSERT_LIST_ELEMENT(testElement_2, testList->head);
+  TEST_ASSERT_LIST_ELEMENT(testElement_1, testList->tail);
+  TEST_ASSERT_NULL(testList->tail->next);
+  TEST_ASSERT_EQUAL(2,testList->length);
 }
 
 /**
@@ -382,22 +373,21 @@ void test_listRemoveFirst_given_LinkedList_with_3_Element_should_return_LinkedLi
  *     * head * ----->NULL
  *     ********
  */
-void test_listRemoveFirst_given_LinkList_with_1_Element_should_return_empty_LinkList(void){
-  LinkedList* testStack = createLinkedList();
+void test_listRemoveFirst_given_LinkedList_with_1_Element_should_return_empty_LinkedList(void){
+  LinkedList* testList = createLinkedList();
   int i = 10;
-  ListElement* removedElement = malloc(sizeof(ListElement));
-  ListElement* testElement_1 = createListElement((void*)&i);
-  addListFirst(testStack,testElement_1);
+  ListElement* removedElement;
+  ListElement* testElement_1 = createListElement(&i);
+  addListFirst(testList,testElement_1);
 
-  removedElement = listRemoveFirst(testStack);
+  removedElement = listRemoveFirst(testList);
 
-  TEST_ASSERT_NOT_NULL(testStack);
-  TEST_ASSERT_NOT_NULL(testElement_1);
   TEST_ASSERT_NOT_NULL(removedElement);
-  TEST_ASSERT_NULL(testStack->head);
-  TEST_ASSERT_NULL(testStack->tail);
-  TEST_ASSERT_EQUAL(10,*(int*)removedElement->value);
-  TEST_ASSERT_EQUAL(0,testStack->length);
+  TEST_ASSERT_NULL(testList->head);
+  TEST_ASSERT_NULL(testList->tail);
+  TEST_ASSERT_LIST_ELEMENT(testElement_1, removedElement);
+  TEST_ASSERT_NULL(removedElement->next);
+  TEST_ASSERT_EQUAL(0,testList->length);
 }
 
 /**
@@ -408,15 +398,20 @@ void test_listRemoveFirst_given_LinkList_with_1_Element_should_return_empty_Link
  *  Then, return NULL!
  */
 void test_listRemoveFirst_NULL_List_remove_Element_should_return_error(void){
-  LinkedList* testList = NULL;
-  ListElement* removedElement = malloc(sizeof(ListElement));
-  removedElement = listRemoveFirst(testList);
-
-  TEST_ASSERT_NULL(testList);
+  Try{
+    LinkedList* testList = NULL;
+    ListElement* removedElement;
+    removedElement = listRemoveFirst(testList);
+    TEST_FAIL_MESSAGE("Expected ERR_NULL_LIST but no error thrown");
+  }Catch(err){
+    TEST_ASSERT_EQUAL(ERR_NULL_LIST, err->errorCode);
+    TEST_ASSERT_EQUAL_STRING("ERROR: Link List cannot be NULL!", err->errorMsg);
+    free(err);
+  }
 }
 
 /**
- *  If the Stack is empty, stackRemove tell error and return a NULL
+ *  If the LinkedList is empty, listRemoveFirst throw error and return a NULL
  *
  *  Before:                     After:
  *
@@ -428,9 +423,9 @@ void test_listRemoveFirst_NULL_List_remove_Element_should_return_error(void){
  *
  *                              Return NULL
  */
-void test_listRemoveFirst_given_EmptyLinkedList_should_display_error_and_return_NULL_Element(void){
+void test_listRemoveFirst_given_Empty_LinkedList_should_display_error_and_return_NULL_Element(void){
   LinkedList* testList = createLinkedList();
-  ListElement* removedElement = malloc(sizeof(ListElement));
+  ListElement* removedElement;
 
   removedElement = listRemoveFirst(testList);
 
@@ -456,28 +451,24 @@ void test_listRemoveFirst_given_EmptyLinkedList_should_display_error_and_return_
  */
 void test_listRemoveLast_given_LinkedList_with_3_Element_should_return_removed_element(void){
   LinkedList* testList = createLinkedList();
-  ListElement* removedElement = malloc(sizeof(ListElement));
+  ListElement* removedElement;
   int i_10 = 10;
   int i_5 = 5;
   int i_2 = 2;
-  ListElement* testElement_1 = createListElement((void*)&i_10);
-  ListElement* testElement_2 = createListElement((void*)&i_5);
-  ListElement* testElement_3 = createListElement((void*)&i_2);
+  ListElement* testElement_1 = createListElement(&i_10);
+  ListElement* testElement_2 = createListElement(&i_5);
+  ListElement* testElement_3 = createListElement(&i_2);
   addListLast(testList,testElement_1);
   addListLast(testList,testElement_2);
   addListLast(testList,testElement_3);
 
   removedElement = listRemoveLast(testList);
 
-  TEST_ASSERT_NOT_NULL(testList);
-  TEST_ASSERT_NOT_NULL(testElement_1);
-  TEST_ASSERT_NOT_NULL(testElement_2);
-  TEST_ASSERT_NOT_NULL(testElement_3);
   TEST_ASSERT_NOT_NULL(removedElement);
-  TEST_ASSERT_EQUAL(2, *(int*)removedElement->value);
+  TEST_ASSERT_LIST_ELEMENT(testElement_3, removedElement);
   TEST_ASSERT_NULL(removedElement->next);
-  TEST_ASSERT_EQUAL(10, *(int*)testList->head->value);
-  TEST_ASSERT_EQUAL(5, *(int*)testList->tail->value);
+  TEST_ASSERT_EQUAL(testElement_1, testList->head);
+  TEST_ASSERT_EQUAL(testElement_2, testList->tail);
   TEST_ASSERT_NULL(testList->tail->next);
   TEST_ASSERT_EQUAL(2,testList->length);
 }
@@ -499,17 +490,15 @@ void test_listRemoveLast_given_LinkedList_with_3_Element_should_return_removed_e
  */
 void test_listRemoveLast_given_LinkedList_with_1_Element_should_return_removed_element(void){
   LinkedList* testList = createLinkedList();
-  ListElement* removedElement = malloc(sizeof(ListElement));
+  ListElement* removedElement;
   int i = 10;
-  ListElement* testElement_1 = createListElement((void*)&i);
+  ListElement* testElement_1 = createListElement(&i);
   addListLast(testList,testElement_1);
 
   removedElement = listRemoveLast(testList);
 
-  TEST_ASSERT_NOT_NULL(testList);
-  TEST_ASSERT_NOT_NULL(testElement_1);
   TEST_ASSERT_NOT_NULL(removedElement);
-  TEST_ASSERT_EQUAL(10, *(int*)removedElement->value);
+  TEST_ASSERT_LIST_ELEMENT(testElement_1, removedElement);
   TEST_ASSERT_NULL(removedElement->next);
   TEST_ASSERT_NULL(testList->head);
   TEST_ASSERT_NULL(testList->tail);
@@ -529,7 +518,7 @@ void test_listRemoveLast_given_LinkedList_with_1_Element_should_return_removed_e
  *
  *                              Return NULL
  */
-void test_listRemoveLast_given_EmptyLinkedList_should_display_error_and_return_NULL_Element(void){
+void test_listRemoveLast_given_Empty_LinkedList_return_NULL_Element(void){
   LinkedList* testList = createLinkedList();
   ListElement* removedElement = malloc(sizeof(ListElement));
 
@@ -543,17 +532,23 @@ void test_listRemoveLast_given_EmptyLinkedList_should_display_error_and_return_N
 /**
  *  if LinkedList is NULL while calling listRemoveLast
  *
- *  tell error
+ *  Throw ERR_NULL_LIST
  *  ERROR: Link List cannot be NULL
  *  Then, return NULL!
  */
 void test_listRemoveLast_NULL_List_remove_Element_should_return_error(void){
-  LinkedList* testList = NULL;
-  ListElement* removedElement = malloc(sizeof(ListElement));
-  removedElement = listRemoveLast(testList);
-
-  TEST_ASSERT_NULL(testList);
+  Try{
+    LinkedList* testList = NULL;
+    ListElement* removedElement = malloc(sizeof(ListElement));
+    removedElement = listRemoveLast(testList);
+    TEST_FAIL_MESSAGE("Expected ERR_NULL_LIST but no error thrown");
+  }Catch(err){
+    TEST_ASSERT_EQUAL(ERR_NULL_LIST, err->errorCode);
+    TEST_ASSERT_EQUAL_STRING("ERROR: Link List cannot be NULL!", err->errorMsg);
+    free(err);
+  }
 }
+
 /**
  *    Before
  *     ********---------------------------------------------------------------------------------
@@ -571,19 +566,19 @@ void test_listRemoveLast_NULL_List_remove_Element_should_return_error(void){
  *
  */
 void test_findElement_given_integer(void){
-  int value1 = 1;
   int myValue1 = 1;
+  int value1 = 1;
   int value3 = 3;
   int value4 = 4;
   int value6 = 6;
   int value7 = 7;
   
   LinkedList* list = createLinkedList();
-  ListElement* elem3 = createListElement((void*)&value3);
-  ListElement* elem7 = createListElement((void*)&value7);
-  ListElement* elem1 = createListElement((void*)&value1);
-  ListElement* elem4 = createListElement((void*)&value4);
-  ListElement* elem6 = createListElement((void*)&value6);
+  ListElement* elem1 = createListElement(&value1);
+  ListElement* elem3 = createListElement(&value3);
+  ListElement* elem4 = createListElement(&value4);
+  ListElement* elem6 = createListElement(&value6);
+  ListElement* elem7 = createListElement(&value7);
   
   list->head = elem3;
   addListLast(list,elem7);
@@ -593,9 +588,6 @@ void test_findElement_given_integer(void){
   
   ListElement* testElem = listFind(list, &myValue1, intCompare);
   
-  TEST_ASSERT_NOT_NULL(list);
-  TEST_ASSERT_NOT_NULL(testElem);
-  TEST_ASSERT_NOT_NULL(testElem->value);
   TEST_ASSERT_EQUAL(1, *(int *)(testElem->value));
 }
 /**
@@ -638,9 +630,6 @@ void test_findElement_given_string(void){
 
   ListElement* testElem = listFind(list, myStr4, stringCompare);
   
-  TEST_ASSERT_NOT_NULL(list);
-  TEST_ASSERT_NOT_NULL(testElem);
-  TEST_ASSERT_NOT_NULL(testElem->value);
   TEST_ASSERT_EQUAL_STRING("four", (char *)(testElem->value));
 }
 
@@ -653,6 +642,5 @@ void test_findElement_given_NULL_list_should_return_NULL_Element(void){
 
   ListElement* testElem = listFind(list, &myValue1, intCompare);
   
-  TEST_ASSERT_NULL(list);
   TEST_ASSERT_NULL(testElem);
 }
