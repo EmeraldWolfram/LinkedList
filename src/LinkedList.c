@@ -85,8 +85,7 @@ void addListFirst(LinkedList* list, ListElement *elem){
     elem = elem;
   }
   else{
-    ListElement* prevHead = malloc(sizeof(ListElement));
-    prevHead = list->head;
+    ListElement* prevHead = list->head;
     list->head = elem; //No matter what, the head always point to the new added Element
     
     if(list->length == 0){
@@ -97,7 +96,6 @@ void addListFirst(LinkedList* list, ListElement *elem){
       list->head->next = prevHead;
     
     (list->length)++;
-    list->tail->next = NULL; //Tail->next permanently pointing to NULL
   }
 }
 
@@ -112,7 +110,6 @@ ListElement* listRemoveFirst(LinkedList* link){
     removedElement = NULL;
   }
   else{
-    removedElement = malloc(sizeof(ListElement));
     removedElement = link->head;
     if(link->head->next != NULL)
       link->head = link->head->next;
@@ -128,7 +125,7 @@ ListElement* listRemoveFirst(LinkedList* link){
 
 ListElement* listRemoveLast(LinkedList* link){
   ListElement* removedElement;
-  ListElement* tempNode = malloc(sizeof(ListElement));
+  ListElement* tempNode;
  
   if(link == NULL){    
     removedElement = NULL;
@@ -138,8 +135,7 @@ ListElement* listRemoveLast(LinkedList* link){
     removedElement = NULL;
   }
   else{
-    tempNode = link->head;
-    removedElement = malloc(sizeof(ListElement));
+    tempNode  = link->head;
     removedElement = link->tail;
     if(tempNode->next != NULL){
       while(tempNode->next != link->tail){
@@ -152,6 +148,7 @@ ListElement* listRemoveLast(LinkedList* link){
       link->head = NULL;
       link->tail = NULL;
     }
+    removedElement->next = NULL;
     link->length --;
   }
   return removedElement;
